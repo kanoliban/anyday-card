@@ -46,12 +46,7 @@ export function DoubleSidedCard({
   }, []);
 
   const cardContent = (side: 'front' | 'back') => (
-    <div
-      className={cn(
-        'flex flex-col items-center gap-2',
-        isMobile && 'w-full shrink-0 snap-center',
-      )}
-    >
+    <div className="flex flex-col items-center gap-2">
       <span className="font-mono text-xs uppercase tracking-widest text-stone-500">
         {side === 'front' ? 'FRONT' : 'BACK'}
       </span>
@@ -71,6 +66,23 @@ export function DoubleSidedCard({
     </div>
   );
 
+  // Desktop: side-by-side layout
+  if (!isMobile) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="flex items-start gap-4"
+      >
+        {cardContent('front')}
+        {cardContent('back')}
+      </motion.div>
+    );
+  }
+
+  // Mobile: horizontal swipe carousel with centered cards
   return (
     <div className="flex flex-col items-center gap-3">
       <motion.div
@@ -80,33 +92,30 @@ export function DoubleSidedCard({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
         onScroll={handleScroll}
-        className={cn(
-          'flex items-start',
-          isMobile
-            ? 'w-[80vw] snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
-            : 'gap-4',
-        )}
+        className="flex w-full snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
-        {cardContent('front')}
-        {cardContent('back')}
+        <div className="flex w-full shrink-0 snap-center justify-center">
+          {cardContent('front')}
+        </div>
+        <div className="flex w-full shrink-0 snap-center justify-center">
+          {cardContent('back')}
+        </div>
       </motion.div>
 
-      {isMobile && (
-        <div className="flex items-center gap-2">
-          {[0, 1].map((index) => (
-            <button
-              key={index}
-              type="button"
-              aria-label={index === 0 ? 'View front' : 'View back'}
-              onClick={() => scrollToIndex(index)}
-              className={cn(
-                'size-2 rounded-full transition-colors',
-                activeIndex === index ? 'bg-stone-600' : 'bg-stone-300',
-              )}
-            />
-          ))}
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+        {[0, 1].map((index) => (
+          <button
+            key={index}
+            type="button"
+            aria-label={index === 0 ? 'View front' : 'View back'}
+            onClick={() => scrollToIndex(index)}
+            className={cn(
+              'size-2 rounded-full transition-colors',
+              activeIndex === index ? 'bg-stone-600' : 'bg-stone-300',
+            )}
+          />
+        ))}
+      </div>
     </div>
   );
 }
