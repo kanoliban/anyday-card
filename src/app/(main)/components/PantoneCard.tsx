@@ -1,11 +1,8 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useTheme } from 'next-themes';
-import { ComponentProps } from 'react';
+import { ComponentProps, useState } from 'react';
 
-import { Theme } from '~/src/app/constants';
-import ClientRendered from '~/src/components/ClientRendered';
 import { InfoIcon } from '~/src/components/icons';
 import CardTitle from '~/src/components/ui/CardTitle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/src/components/ui/Tooltip';
@@ -14,22 +11,19 @@ import Card from './Card';
 
 import './PantoneCard.css';
 
-import useColorTheme from './useColorTheme';
-
-type Pantone = {
+type PaperStock = {
   name: string;
+  weight: string;
+  texture: string;
+  color: string;
 };
 
-const pantoneByTheme: Record<Theme, Pantone> = {
-  'blue-light': { name: 'Misty Morning' },
-  'blue-dark': { name: 'Midnight Cruising' },
-  'red-light': { name: 'Golden Hour' },
-  'red-dark': { name: 'Lava Lamp' },
-  'green-light': { name: 'Pistacchio Cream' },
-  'green-dark': { name: 'The Matrix' },
-  dark: { name: 'Jade Dusk' },
-  light: { name: 'Ghost Fog' },
-};
+const paperStocks: PaperStock[] = [
+  { name: 'Cotton', weight: '110lb', texture: 'Textured', color: '#FAF9F6' },
+  { name: 'Premium Smooth', weight: '120lb', texture: 'Smooth', color: '#FFFFFF' },
+  { name: 'Linen', weight: '100lb', texture: 'Woven', color: '#F5F5F0' },
+  { name: 'Velvet', weight: '110lb', texture: 'Soft-touch', color: '#FEFEFA' },
+];
 
 const slideLeftProps: Partial<ComponentProps<typeof motion.div>> = {
   initial: { opacity: 0, x: 50 },
@@ -42,37 +36,52 @@ const slideLeftProps: Partial<ComponentProps<typeof motion.div>> = {
   },
 };
 
-export default function PantoneCard() {
-  const { resolvedTheme } = useTheme();
-  const { colorTheme } = useColorTheme();
-
-  const themeName = [colorTheme, resolvedTheme].filter(Boolean).join('-');
-
-  const name = pantoneByTheme[themeName as Theme]?.name;
+export default function PaperStockCard() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeStock = paperStocks[activeIndex];
 
   return (
     <Card containerClassName="z-3 pantone-card">
       <div className="flex min-h-[210px] w-full flex-col gap-3">
-        <div className="bg-theme-2 flex-1 rounded-md transition-all duration-250"></div>
+        <div
+          className="flex-1 rounded-md border border-stone-200 transition-all duration-250"
+          style={{ backgroundColor: activeStock.color }}
+        />
+        <div className="mb-2 flex gap-1">
+          {paperStocks.map((stock, i) => (
+            <button
+              key={stock.name}
+              onClick={() => setActiveIndex(i)}
+              className={`h-2 flex-1 rounded-full transition-all ${
+                i === activeIndex ? 'bg-theme-1' : 'bg-stone-200 hover:bg-stone-300'
+              }`}
+              aria-label={`View ${stock.name} paper stock`}
+            />
+          ))}
+        </div>
         <div className="flex justify-between">
           <div className="flex-1 overflow-hidden">
             <AnimatePresence mode="wait" initial={false}>
-              <motion.div className="text-text-primary" key={name} {...slideLeftProps}>
+              <motion.div
+                className="text-text-primary"
+                key={activeStock.name}
+                {...slideLeftProps}
+              >
                 <CardTitle variant="mono" className="inline">
-                  PANTONE
+                  {activeStock.name}
                 </CardTitle>{' '}
                 <span className="text-sm">
-                  <ClientRendered>{name}</ClientRendered>
+                  {activeStock.weight} · {activeStock.texture}
                 </span>
               </motion.div>
             </AnimatePresence>
           </div>
           <Tooltip>
-            <TooltipTrigger className="rounded-full" aria-label="Fictional Pantone color name">
+            <TooltipTrigger className="rounded-full" aria-label="Paper stock information">
               <InfoIcon className="text-text-primary" />
             </TooltipTrigger>
             <TooltipContent className="w-[200px] text-center">
-              Sorry, these Pantone color names are entirely fictional.
+              All cards printed on premium archival paper for lasting quality.
             </TooltipContent>
           </Tooltip>
         </div>
@@ -80,3 +89,5 @@ export default function PantoneCard() {
     </Card>
   );
 }
+
+export { PaperStockCard as PantoneCard };

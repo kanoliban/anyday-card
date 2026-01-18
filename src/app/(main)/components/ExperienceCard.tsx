@@ -1,101 +1,54 @@
-import { ArrowUpRight } from 'lucide-react';
-import { ReactNode } from 'react';
-
 import CardTitle from '~/src/components/ui/CardTitle';
-import Tag from '~/src/components/ui/Tag';
 
 import Card from './Card';
 
-type Position = {
-  title: ReactNode;
-  company?: { name: string; href: string };
-  from: string;
-  to?: string;
-  muted?: boolean;
+type Step = {
+  number: string;
+  title: string;
+  description: string;
 };
 
-const positions: Position[] = [
+const steps: Step[] = [
   {
-    title: 'Senior Brand Designer',
-    company: { name: 'Vercel', href: 'https://vercel.com/home' },
-    from: '2025',
+    number: '01',
+    title: 'Browse',
+    description: 'Explore cards by occasion',
   },
   {
-    title: 'Senior Designer',
-    company: { name: 'LiveKit', href: 'https://livekit.io' },
-    from: '2024',
-    to: '2025',
+    number: '02',
+    title: 'Select',
+    description: 'Choose physical or digital',
   },
   {
-    title: 'Brand Designer',
-    company: { name: 'Supabase', href: 'https://supabase.com/' },
-    from: '2022',
-    to: '2024',
+    number: '03',
+    title: 'Personalize',
+    description: 'Add your message',
   },
   {
-    title: (
-      <a
-        className="group text-text-primary/50 hover:text-main-accent inline-flex items-center"
-        href="https://www.linkedin.com/in/marijana-pavlinic/"
-        target="_blank"
-        rel="noreferrer"
-      >
-        View full work history
-        <ArrowUpRight className="ml-0.5 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
-      </a>
-    ),
-    from: '2022',
-    to: '2017',
-    muted: true,
+    number: '04',
+    title: 'Send',
+    description: 'We print & ship, or download instantly',
   },
 ];
 
-export default function ExperienceCard() {
+export default function HowItWorksCard() {
   return (
     <Card>
       <div className="flex flex-col justify-between px-2">
         <CardTitle variant="mono" className="border-panel-border mb-10 pb-6">
-          Work
+          How it works
         </CardTitle>
         <ul className="flex flex-col">
-          {positions.map((p, i) => (
+          {steps.map((step, i) => (
             <li
               key={i}
-              className="border-panel-border flex flex-row items-center justify-between border-b py-2 text-sm last-of-type:border-none"
+              className="border-panel-border flex flex-row items-center justify-between border-b py-3 text-sm last-of-type:border-none"
             >
-              <span className="flex flex-1 flex-wrap items-center gap-2 whitespace-nowrap">
-                {!p.to && (
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="bg-main-accent absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
-                    <span className="bg-main-accent relative inline-flex h-1.5 w-1.5 rounded-full"></span>
-                  </span>
-                )}
-                <span className="flex items-center gap-1">
-                  <span className={p.muted ? 'text-text-primary/60' : 'text-text-primary'}>
-                    {p.title} {p.company && p.title !== 'Other' && 'at'}{' '}
-                  </span>
-                  {p.company ? (
-                    <Tag asChild className="bg-transparent p-0">
-                      {p.company.href ? (
-                        <a
-                          className="text-md group text-text-primary hover:text-main-accent inline-flex items-center"
-                          href={p.company.href}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          {p.company.name}
-                          <ArrowUpRight className="ml-0.5 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
-                        </a>
-                      ) : (
-                        <span className="text-xs">{p.company.name}</span>
-                      )}
-                    </Tag>
-                  ) : null}
-                </span>
-              </span>
-              <span className={p.muted ? 'text-text-primary/60' : 'text-text-primary'}>
-                <span className="xs:block hidden">
-                  {p.from}—{p.to ? p.to : 'present'}
+              <span className="flex flex-1 items-center gap-4">
+                <span className="font-mono text-xs text-theme-1">{step.number}</span>
+                <span className="flex flex-col gap-0.5">
+                  <span className="font-medium text-text-primary">{step.title}</span>
+                  <span className="text-text-primary/60 text-xs">{step.description}</span>
                 </span>
               </span>
             </li>
@@ -105,3 +58,5 @@ export default function ExperienceCard() {
     </Card>
   );
 }
+
+export { HowItWorksCard as ExperienceCard };

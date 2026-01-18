@@ -35,7 +35,9 @@ export const photos = [
 
 const slideDurationMs = 5000;
 
-export default function PhotosCard() {
+export { LifestyleGalleryCard as PhotosCard };
+
+export default function LifestyleGalleryCard() {
   const [photo, setPhoto] = useState(0);
   const photoRefs = useRef(new Map<Element, { e: Element; i: number }>());
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -95,7 +97,7 @@ export default function PhotosCard() {
   return (
     <Card className="flex flex-col gap-5 ">
       <div className="flex flex-col items-start justify-between gap-2 xxs:flex-row xxs:items-center">
-        <CardTitle variant="mono">Camera roll</CardTitle>
+        <CardTitle variant="mono">Cards in the wild</CardTitle>
         <div className="flex items-center justify-center gap-[6px]">
           {photos.map((p, i) => (
             <button

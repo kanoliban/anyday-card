@@ -1,38 +1,41 @@
-import { cn, preloadImage } from '~/src/util';
+import { Metadata } from 'next';
 
-import Description from './components/Description';
-import Cards from './components/Stamps';
-import SVGFilters from './components/SVGFilters';
-import { collections, CollectionType } from './constants';
+import ClientRendered from '~/src/components/ClientRendered';
 
-import './page.css';
+import CartDrawer from '../(main)/shop/components/CartDrawer';
+import CardsGrid from './components/CardsGrid';
+import Header from './components/Header';
+import { cards, CollectionFilter } from './constants';
 
-const preloadCollection = (collection: CollectionType) => {
-  collections[collection].cards.forEach((card) => {
-    preloadImage(card.src);
-  });
+export const metadata: Metadata = {
+  title: 'Cards | AnyDayCard',
+  description:
+    'Browse our collection of AI-generated greeting cards. Buy as-is or customize with our wizard.',
 };
 
-export default function Page() {
-  preloadCollection('celebrations');
+export default async function CardsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ c?: CollectionFilter }>;
+}) {
+  const params = await searchParams;
+
+  const filteredCards = cards.filter((card) => {
+    if (!params?.c || params.c === 'all') {
+      return true;
+    }
+    return card.collection === params.c;
+  });
 
   return (
-    <div
-      className={cn(
-        'cards-page grain grid min-h-svh grid-cols-1 grid-rows-[auto_auto] gap-10 overflow-clip bg-stone-100  lg:h-screen lg:max-h-screen lg:grid-cols-[minmax(auto,600px)_1fr] lg:grid-rows-1 lg:gap-x-6 lg:pl-10 xl:gap-x-10',
-      )}
-    >
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `:root{background:#f5f5f4 !important;}`,
-        }}
-      />
-      <div className="overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-track-stone-100 scrollbar-thumb-stone-300">
-        <Description className="mx-auto max-w-xl px-4 pt-4 lg:pb-10 lg:pt-5" />
-      </div>
-      <Cards />
-
-      <SVGFilters className="pointer-events-none absolute" />
+    <div className="flex min-h-svh flex-1 flex-col bg-main-background">
+      <Header />
+      <main className="flex-1">
+        <ClientRendered>
+          <CardsGrid cards={filteredCards} />
+        </ClientRendered>
+      </main>
+      <CartDrawer />
     </div>
   );
 }

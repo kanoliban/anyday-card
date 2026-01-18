@@ -36,7 +36,14 @@ const submitClicks = (amount: number) => {
   });
 };
 
-export default function SneakPeekCard({ currentCount }: { currentCount: number }) {
+export { ComingSoonCard as SneakPeekCard };
+
+export default function ComingSoonCard({
+  currentCount,
+}: {
+  currentCount: number;
+  metrics?: unknown;
+}) {
   const [clickCount, setClickCount] = useState(0);
   const cycleClickCount = clickCount % (maxClicks + 1);
 
@@ -69,12 +76,12 @@ export default function SneakPeekCard({ currentCount }: { currentCount: number }
   return (
     <Card className="flex flex-col">
       <CardTitle variant="mono" className="mb-2">
-        In Progress
+        Coming Soon
       </CardTitle>
       <div className="mb-20 flex items-start justify-between xl:mb-[120px]">
         <div className="font-archivo text-3xl md:text-4xl">
-          Sneak <br className="hidden md:block" />
-          peek
+          New <br className="hidden md:block" />
+          design
         </div>
       </div>
       <div className="relative flex flex-col gap-4">
@@ -87,15 +94,15 @@ export default function SneakPeekCard({ currentCount }: { currentCount: number }
               exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
               transition={{ duration: 0.3 }}
             >
-              Follow on{' '}
+              Follow us on{' '}
               <TextLink
-                href="https://twitter.com/marijanapav"
+                href="https://instagram.com/anydaycards"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Twitter
+                Instagram
               </TextLink>{' '}
-              for more in-progress pieces like this one.{' '}
+              to be the first to see new designs.{' '}
             </motion.p>
           )}
         </AnimatePresence>
@@ -135,8 +142,7 @@ export default function SneakPeekCard({ currentCount }: { currentCount: number }
       <div className="relative h-full min-h-[284px] w-full overflow-hidden rounded-md">
         <Image
           src={SneakPeekPhoto}
-          // todo: better alt text
-          alt="A sneak peek of my current project"
+          alt="Preview of upcoming card design"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px): 50vw, 284px"
           placeholder="blur"

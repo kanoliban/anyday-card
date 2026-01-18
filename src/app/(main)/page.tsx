@@ -90,9 +90,9 @@ const fetchSystemMetrics = ({ timeout = 1000 }) => {
 };
 
 export const metadata: Metadata = {
-  title: 'About | Marijana Pavlinić',
+  title: 'AnyDayCard | Thoughtfully Designed Greeting Cards',
   description:
-    'Designer and Illustrator working remotely from Croatia, deep diving into all things digital, crafting websites and brands.',
+    'Discover beautifully crafted greeting cards for every occasion. Premium paper stock, timeless designs, available as physical prints or digital downloads.',
 };
 
 export default async function Home() {

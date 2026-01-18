@@ -115,8 +115,9 @@ export default function Carousel({
                   quality={90}
                   alt=""
                   src={src}
+                  fill
                   sizes="(max-width: 1360px) 90vw, 1360px"
-                  className="h-full w-full rounded-lg object-cover object-center focus-visible:outline-none"
+                  className="rounded-lg object-cover object-center focus-visible:outline-none"
                 />
               </div>
             </div>
