@@ -76,7 +76,6 @@ import SignOff01 from '~/public/work/program-end/sign-off01.png';
 import SignOff02 from '~/public/work/program-end/sign-off02.png';
 import SignOff03 from '~/public/work/program-end/sign-off03.png';
 import SignOff04 from '~/public/work/program-end/sign-off04.png';
-import rpavlini from '~/public/work/rpavlini/rpavlini.png';
 import Sketchbook01 from '~/public/work/sketchbook/sketchbook_1.png';
 import Sketchbook02 from '~/public/work/sketchbook/sketchbook_2.png';
 import Sketchbook02a from '~/public/work/sketchbook/sketchbook_2a.png';
@@ -168,8 +167,7 @@ export const projects: Project[] = [
     preview: FeedbackPostcards00,
     images: [FeedbackPostcards01, FeedbackPostcards02, FeedbackPostcards03, FeedbackPostcards04, FeedbackPostcards05, FeedbackPostcards06],
     filters: ['illustration'],
-    description: `Illustrations for the digital postcard component, where users can send feedback or request new stamp designs. Each scene captures familiar moments of writing, desktop or mobile — each scene reflects the quiet, everyday contexts in which we send messages. The postcard’s stamp pays homage to the first issue, Queen Victoria’s Penny Black, reimagined as a portrait of the two of us who built this project.`,
-     link: 'https://marijanapav.com/stamps',
+    description: `Illustrations for the digital postcard component, where users can send feedback or request new stamp designs. Each scene captures familiar moments of writing, desktop or mobile — each scene reflects the quiet, everyday contexts in which we send messages.`,
     tags: ['Figma', '© 2025'],
     aspect: 1.1,
   },
@@ -234,19 +232,6 @@ export const projects: Project[] = [
       'A personal collection of sketches made in Procreate—just for fun. I’m planning on adding a lot more sketches and turning them into a showcase site, presented inside a lifelike 3D sketchbook (WIP). ',
     tags: ['Procreate', 'In Progress'],
     aspect: 1.4,
-  },
-  {
-    type: 'project',
-    title: 'Robert Pavlinić Personal Website',
-    slug: 'rpavlini',
-    preview: rpavlini,
-    images: [rpavlini],
-    filters: ['digital', 'branding'],
-    description:
-      'I designed a simple personal website for my partner, drawing inspiration from the minimalist aesthetic that mirrors the simplicity of a markdown file. Next up, we are focused on adding a few components to provide a more personal touch. More on that soon.',
-    link: 'https://rpavlini.com',
-    tags: ['Figma', '© 2024'],
-    aspect: 1.3,
   },
   {
     type: 'project',

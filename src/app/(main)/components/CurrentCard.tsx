@@ -17,13 +17,10 @@ export default function CurrentCard() {
 
   const folderItems = [
     {
-      path: 'buka-studio/www-marijanapav',
-      description:
-        "Like any designer's portfolio, this site is a perpetual WIP. I'm often pushing small nitpick commits.",
+      path: 'kanoliban/anyday-card',
+      description: 'A digital greeting card experience with interactive stamps and personalization.',
     },
     { path: 'livekit/livekit-site', description: 'Another project description here' },
-    { path: 'marijanapav/playground', description: 'Yet another project description' },
-    { path: 'marijanapav/stamps', description: 'Final project description' },
   ];
 
   return (

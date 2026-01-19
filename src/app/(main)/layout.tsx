@@ -5,9 +5,9 @@ import Footer from './components/Footer';
 import './layout.css';
 
 export const metadata: Metadata = {
-  title: "Marijana Pavlinić's Personal Website",
+  title: 'AnyDayCard',
   metadataBase:
-    process.env.NODE_ENV === 'production' ? new URL('https://marijanapav.com') : undefined,
+    process.env.NODE_ENV === 'production' ? new URL('https://anyday-card.vercel.app') : undefined,
 };
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {

@@ -7,7 +7,7 @@ import PostageDue from './PostageDue.svg';
 
 const MAX_CHARS = 300;
 
-const addressLines = ['Robert and Marijana', 'Digital Stamp Collection HQ', 'Feedback Dept.'];
+const addressLines = ['AnyDayCard Team', 'Digital Stamp Collection HQ', 'Feedback Dept.'];
 const placeholders = [
   `hey hi, can we get a Kamakura stamp on the site? big buddha energy pls. ok bye`,
   `hello!! dropping in to request a Himeji stamp because that castle is unreal. ty in advance, greetings from Japan!`,
@@ -90,7 +90,7 @@ export default function FeedbackForm({
           <Image
             className="absolute top-1 right-1 h-full w-full"
             src="/stamps/penny_black.png"
-            alt="Marijana & Robert Penny Black Stamp"
+            alt="Penny Black Stamp"
             unoptimized
             width={90}
             height={120}
