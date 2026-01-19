@@ -6,17 +6,27 @@ import { useState } from 'react';
 
 import { cn } from '~/src/util';
 
+import { collections } from '../../constants';
 import type { Card, CardVariant } from '../../models';
 import { useCardStore } from '../../store';
 
 interface CardPurchasePanelProps {
-  card: Card;
+  card?: Card;
   className?: string;
 }
 
-export function CardPurchasePanel({ card, className }: CardPurchasePanelProps) {
+export function CardPurchasePanel({ card: cardProp, className }: CardPurchasePanelProps) {
   const [variant, setVariant] = useState<CardVariant>('digital');
   const startWizard = useCardStore((s) => s.startWizard);
+  const selectedCardId = useCardStore((s) => s.selectedCardId);
+  const collection = useCardStore((s) => s.collection);
+
+  // Use prop if provided, otherwise get from store
+  const card = cardProp ?? (selectedCardId
+    ? collections[collection]?.cards.find((c) => c.id === selectedCardId) as Card | undefined
+    : undefined);
+
+  if (!card) return null;
 
   const price = variant === 'physical' ? card.pricing.physical : card.pricing.digital;
 
@@ -101,3 +111,5 @@ export function CardPurchasePanel({ card, className }: CardPurchasePanelProps) {
     </motion.div>
   );
 }
+
+export default CardPurchasePanel;
