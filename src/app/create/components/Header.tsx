@@ -28,7 +28,7 @@ export default function Header() {
             variant={f === currentFilter || (!currentFilter && f === 'all') ? 'secondary' : 'primary'}
             className="shrink-0 text-xs md:text-sm"
           >
-            <Link href={f === 'all' ? '/cards' : `/cards?c=${f}`}>{getFilterLabel(f)}</Link>
+            <Link href={f === 'all' ? '/card' : `/card?c=${f}`}>{getFilterLabel(f)}</Link>
           </Button>
         ))}
       </div>

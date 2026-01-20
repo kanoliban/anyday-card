@@ -141,7 +141,7 @@ export default function Description({ className }: { className?: string }) {
             </li>
             <li>
               <Link
-                href="/cards"
+                href="/card"
                 aria-current="page"
                 className="focus-dashed flex items-baseline gap-1 px-1 text-stone-600 hover:text-stone-800"
               >

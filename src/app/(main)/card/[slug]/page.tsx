@@ -54,7 +54,7 @@ export default async function Work({ params }: { params: Promise<{ slug: string 
 
   return (
     <>
-      {project.slug && <ViewLogger pathname={`/cards/${project.slug}`} />}
+      {project.slug && <ViewLogger pathname={`/card/${project.slug}`} />}
       <DynamicVHVarsSetter />
       <MousePositionVarsSetter />
       <div className="flex-1 px-5 py-10 [html:has(&)_footer>*:not(.nav)]:invisible">
@@ -129,12 +129,12 @@ export default async function Work({ params }: { params: Promise<{ slug: string 
           ) : null}
           <div className="flex flex-col justify-center gap-6 md:flex-row md:*:max-w-[400px]">
             {previousProject && (
-              <Link href={`/cards/${previousProject.slug}`} className="flex-1 rounded-xl">
+              <Link href={`/card/${previousProject.slug}`} className="flex-1 rounded-xl">
                 <PaginationCard direction="left" project={previousProject} />
               </Link>
             )}
             {nextProject && (
-              <Link href={`/cards/${nextProject.slug}`} className="flex-1 rounded-xl">
+              <Link href={`/card/${nextProject.slug}`} className="flex-1 rounded-xl">
                 <PaginationCard direction="right" project={nextProject} />
               </Link>
             )}

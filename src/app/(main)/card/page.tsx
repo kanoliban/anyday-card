@@ -24,7 +24,7 @@ export default async function Work({ searchParams }: { searchParams: Promise<{ f
 
   return (
     <div className="flex flex-1 flex-col">
-      <ViewLogger pathname="/cards" />
+      <ViewLogger pathname="/card" />
       <main className="flex-1">
         {/* todo: hotfix, remove client rendered */}
         <ClientRendered>
