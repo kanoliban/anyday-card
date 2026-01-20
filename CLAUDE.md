@@ -99,3 +99,42 @@ Use the PRD for detailed feature specs, user flows, and business requirements.
 - Match wizard input component patterns in `wizard/inputs/`
 - Card pricing: physical + digital variants with USD currency
 - Wizard answers typed as `WizardAnswers` interface
+
+---
+
+## Context Persistence Protocol
+
+**How new Claude Code sessions stay up to date:**
+
+1. **This file (CLAUDE.md)** is auto-loaded when starting Claude Code in this directory
+2. **Update the "Current Status" section below** at end of each session with:
+   - What was accomplished
+   - What's in progress
+   - Known issues or blockers
+3. **Commit CLAUDE.md changes** so context persists across machines/sessions
+
+**Starting a new session:**
+```bash
+cd ~/Projects/anyday-card && claude
+```
+
+Claude automatically reads this file — no need for `git status` to "sync" context.
+
+---
+
+## Current Status
+
+**Last updated:** 2025-01-19
+
+**Recent changes:**
+- Repo renamed from `anyday-cards` → `anyday-card` (GitHub + local)
+- Remote URL updated to `https://github.com/kanoliban/anyday-card.git`
+
+**In progress:**
+- (none currently)
+
+**Next up:**
+- (add planned work here)
+
+**Known issues:**
+- Old `~/Projects/anydaycard` folder still exists (Vite-based, can be deleted)
