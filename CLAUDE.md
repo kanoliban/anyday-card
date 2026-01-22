@@ -17,30 +17,50 @@ npm run lint       # ESLint
 
 The wizard collects personalization data (name, relationship, occasion, vibe, traits) and generates AI-powered messages tailored to each recipient. Cards can be purchased as digital downloads or print-and-ship.
 
-**Note:** The `/stamps` route is a placeholder/showcase feature. The real product is the card wizard at `/cards`.
+**Note:** The `/stamps` route is a placeholder/showcase feature. The real product is the card wizard at `/create`.
+
+## Routes
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Homepage |
+| `/create` | **Core product** - Wizard flow for card personalization |
+| `/card` | Card gallery |
+| `/card/[slug]` | Individual card detail |
+| `/shop` | Shopping cart |
+| `/shop/checkout` | Checkout flow |
+| `/shop/checkout/success` | Order confirmation |
+| `/stamps` | Placeholder/showcase (not core product) |
+| `/about` | About page |
 
 ## Architecture
 
 ```
 src/app/
-├── cards/                    # Core product
-│   ├── wizard/              # Wizard flow components
+├── create/                   # Core product - wizard flow
+│   ├── wizard/              # Wizard components
 │   │   ├── WizardShell.tsx  # Main wizard container
 │   │   ├── questions.ts     # Question configs & step logic
 │   │   ├── AnswerSummary.tsx
 │   │   └── inputs/          # Input components (GridSelect, TextInput, etc.)
-│   ├── components/          # Card display & purchase
-│   │   ├── Stamps/          # Card grid display
+│   ├── components/          # Card display
+│   │   ├── CanvasGrid/      # Card grid display
 │   │   └── MetadataTable/
+│   ├── constants.ts         # Card definitions
 │   ├── models.ts            # Types (WizardStep, Card, WizardAnswers)
 │   └── page.tsx
-├── (main)/                  # Landing pages
-│   ├── shop/               # Shop components, CartDrawer
+├── (main)/                  # Landing pages & shop
+│   ├── card/               # Card gallery & detail pages
+│   ├── shop/               # Cart, checkout, success
 │   └── components/         # Shared UI (ThemeSwitcher, etc.)
 ├── api/                     # API routes
+│   ├── generate/           # AI message generation (Gemini)
+│   ├── checkout/session/   # Stripe checkout session creation
+│   ├── webhooks/stripe/    # Stripe webhook handler
 │   ├── feedback/
+│   ├── analytics/
 │   ├── sketches/
-│   └── analytics/
+│   └── stats/
 └── stamps/                  # Placeholder/showcase (not core product)
 ```
 
@@ -48,20 +68,24 @@ src/app/
 
 | Purpose | Location |
 |---------|----------|
-| Wizard questions & step logic | `src/app/cards/wizard/questions.ts` |
-| Wizard shell | `src/app/cards/wizard/WizardShell.tsx` |
-| Type definitions | `src/app/cards/models.ts` |
-| Card data display | `src/app/cards/components/Stamps/` |
-| Input components | `src/app/cards/wizard/inputs/` |
+| Wizard questions & step logic | `src/app/create/wizard/questions.ts` |
+| Wizard shell | `src/app/create/wizard/WizardShell.tsx` |
+| Type definitions | `src/app/create/models.ts` |
+| Card definitions | `src/app/create/constants.ts` |
+| AI message generation | `src/app/api/generate/route.ts` |
+| Stripe checkout | `src/app/api/checkout/session/route.ts` |
+| Stripe webhooks | `src/app/api/webhooks/stripe/route.ts` |
+| Stripe client | `src/lib/stripe.ts` |
+| Input components | `src/app/create/wizard/inputs/` |
 
 ## Tech Stack
 
 - **Framework:** Next.js 16, React 19, TypeScript
 - **Styling:** Tailwind CSS 4
 - **State:** Zustand
-- **Payments:** Stripe
-- **AI:** Anthropic Claude SDK (message generation)
-- **Database:** Supabase + Kysely
+- **Payments:** Stripe (checkout sessions + webhooks)
+- **AI:** Google Gemini (message generation via `@google/generative-ai`)
+- **Database:** Supabase
 - **Animation:** Framer Motion
 - **UI:** Radix primitives
 
@@ -79,10 +103,16 @@ Steps defined in `questions.ts`:
 
 Conditional logic via `showIf` functions. Navigation via `getNextStep`/`getPrevStep`.
 
-## External Integrations (planned)
+## External Integrations
 
-- **Print Fulfillment:** Lob API
-- **Email:** SendGrid
+**Active:**
+- **AI:** Google Gemini (message generation)
+- **Payments:** Stripe (checkout + webhooks configured)
+- **Database:** Supabase (orders table)
+
+**Planned:**
+- **Print Fulfillment:** Lob API (keys in `.env.local`)
+- **Email:** SendGrid (for digital card delivery)
 - **Analytics:** PostHog, Umami
 
 ## PRD Reference
@@ -124,17 +154,33 @@ Claude automatically reads this file — no need for `git status` to "sync" cont
 
 ## Current Status
 
-**Last updated:** 2025-01-19
+**Last updated:** 2025-01-22
 
 **Recent changes:**
-- Repo renamed from `anyday-cards` → `anyday-card` (GitHub + local)
-- Remote URL updated to `https://github.com/kanoliban/anyday-card.git`
+- Switched AI generation from Anthropic to Google Gemini (`gemini-2.0-flash`)
+- Configured Stripe webhook handler (`/api/webhooks/stripe`)
+- Added `STRIPE_WEBHOOK_SECRET` to `.env.local`
+- Fixed Turbopack root configuration (prevents compilation hangs)
+- Updated CLAUDE.md to reflect current architecture
 
-**In progress:**
-- (none currently)
+**Completed features:**
+- Wizard flow at `/create` (name, relationship, occasion, vibe, traits)
+- AI message generation (Gemini with fallback templates)
+- Card gallery at `/card`
+- Shopping cart and Stripe checkout
+- Webhook handler saves orders to Supabase
 
 **Next up:**
-- (add planned work here)
+- Lob integration for physical card printing
+- Email delivery for digital cards
+- End-to-end purchase flow testing
 
 **Known issues:**
-- Old `~/Projects/anydaycard` folder still exists (Vite-based, can be deleted)
+- Gemini API quota may be exceeded (fallback messages will be used)
+- `Libertinus Serif` font fallback warning (cosmetic, doesn't affect functionality)
+
+**Local development:**
+```bash
+npm run dev                    # Start Next.js dev server
+stripe listen --forward-to localhost:3000/api/webhooks/stripe  # Webhook testing
+```
