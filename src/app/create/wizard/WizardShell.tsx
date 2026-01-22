@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { cn } from '~/src/util';
 
@@ -19,9 +19,10 @@ import {
 
 type Props = {
   className?: string;
+  onComplete?: () => void;
 };
 
-export default function WizardShell({ className }: Props) {
+export default function WizardShell({ className, onComplete }: Props) {
   const wizardStep = useCardStore((s) => s.wizardStep);
   const wizardAnswers = useCardStore((s) => s.wizardAnswers);
   const setWizardStep = useCardStore((s) => s.setWizardStep);
@@ -74,6 +75,24 @@ export default function WizardShell({ className }: Props) {
   const handleClose = useCallback(() => {
     resetWizard();
   }, [resetWizard]);
+
+  // Track if onComplete has been called to prevent infinite loops
+  const onCompleteCalledRef = useRef(false);
+
+  // Reset the ref when wizard step changes away from preview
+  useEffect(() => {
+    if (wizardStep !== 'preview') {
+      onCompleteCalledRef.current = false;
+    }
+  }, [wizardStep]);
+
+  // Call onComplete when wizard reaches preview step (once)
+  useEffect(() => {
+    if (wizardStep === 'preview' && onComplete && !onCompleteCalledRef.current) {
+      onCompleteCalledRef.current = true;
+      onComplete();
+    }
+  }, [wizardStep, onComplete]);
 
   const renderInput = useCallback(() => {
     if (!currentQuestion) return null;

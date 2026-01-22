@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import Button from '~/src/components/ui/Button';
 import { cn } from '~/src/util';
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export default function CardPurchaseForm({ card, className }: Props) {
+  const router = useRouter();
   const [variant, setVariant] = useState<CardVariant>('digital');
   const [mode, setMode] = useState<'buy' | 'customize'>('buy');
   const [added, setAdded] = useState(false);
@@ -26,6 +28,10 @@ export default function CardPurchaseForm({ card, className }: Props) {
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
     setCartOpen(true);
+  }
+
+  function handleCustomize() {
+    router.push(`/create/wizard?card=${card.id}`);
   }
 
   return (
@@ -44,11 +50,10 @@ export default function CardPurchaseForm({ card, className }: Props) {
           Buy As-Is
         </button>
         <button
-          disabled
-          className="flex-1 cursor-not-allowed rounded-lg border border-theme-2 px-4 py-2 text-sm font-medium text-text-secondary opacity-50"
+          onClick={handleCustomize}
+          className="flex-1 rounded-lg border border-theme-2 px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:border-text-primary"
         >
           Customize
-          <span className="ml-1 text-xs">(Soon)</span>
         </button>
       </div>
 
