@@ -17,6 +17,13 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
+// Warm trio palette for step icons
+const STEP_COLORS = [
+  'bg-[#FF6B6B]', // Coral
+  'bg-[#FFD93D]', // Gold
+  'bg-[#4ECDC4]', // Teal
+];
+
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="px-6 py-24">
@@ -51,7 +58,7 @@ export function HowItWorks() {
                 variants={item}
                 className="texture-grain edge-highlight group relative rounded-2xl border border-black/10 bg-panel-background p-8 shadow-premium transition-shadow hover:shadow-xl"
               >
-                <div className="mb-6 flex size-16 items-center justify-center rounded-2xl bg-theme-3 text-theme-1 transition-transform group-hover:scale-110">
+                <div className={`mb-6 flex size-16 items-center justify-center rounded-2xl ${STEP_COLORS[i]} text-white transition-transform group-hover:scale-110`}>
                   <Icon size={32} weight="duotone" />
                 </div>
                 <h3 className="mb-3 text-xl font-bold text-text-primary">
