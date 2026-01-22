@@ -24,3 +24,23 @@ export async function createClient() {
     },
   });
 }
+
+/**
+ * Creates a Supabase client with service role key.
+ * Use this for server-side operations that need to bypass RLS.
+ * DO NOT expose this client to the browser.
+ */
+export function createServiceClient() {
+  return createServerClient(process.env.DB_URL!, process.env.DB_SERVICE_KEY!, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    cookies: {
+      getAll() {
+        return [];
+      },
+      setAll() {},
+    },
+  });
+}

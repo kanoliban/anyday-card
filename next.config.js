@@ -4,6 +4,7 @@ const nextConfig = {
     qualities: [80, 90, 100],
   },
   turbopack: {
+    root: __dirname,
     rules: {
       '*.svg': {
         loaders: [

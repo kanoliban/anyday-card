@@ -20,6 +20,7 @@ export interface InteractiveBookProps {
     className?: string;
     width?: number | string;
     height?: number | string;
+    hintText?: string;
 }
 
 export default function InteractiveBook({
@@ -30,6 +31,7 @@ export default function InteractiveBook({
     className,
     width = 350,
     height = 500,
+    hintText = "Click to Open",
 }: InteractiveBookProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [currentPageIndex, setCurrentPageIndex] = useState(-1);
@@ -288,7 +290,7 @@ export default function InteractiveBook({
                     className="absolute bottom-4 text-neutral-500 dark:text-neutral-400 text-sm font-medium tracking-widest uppercase cursor-pointer z-50 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors"
                     onClick={handleOpenBook}
                 >
-                    Click to Open
+                    {hintText}
                 </motion.div>
             )}
         </div>

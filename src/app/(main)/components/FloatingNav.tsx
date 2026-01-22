@@ -11,10 +11,10 @@ import { ArrowRightIcon } from '~/src/components/icons';
 import { cn } from '~/src/util';
 
 const links = {
-  '/card': { label: 'Card Gallery', width: 7.5 },
-  '/': { label: 'Home', width: 4.55 },
+  '/': { label: 'Home Page', width: 6.5 },
   '/create': { label: 'Create Card', width: 7 },
-  '/about': { label: 'About', width: 4.5 },
+  '/card': { label: 'Card Gallery', width: 7.5 },
+  '/about': { label: 'About Us', width: 5.5 },
 };
 
 export default function Navabar() {

@@ -24,7 +24,8 @@ export default function BrandStoryCard() {
       <p className="text-4xl italic leading-snug text-text-primary">
         Writing the perfect card message is hard. That's where we come in. Tell us about
         them—their humor, what makes them special—and we'll write something that sounds like you
-        wrote it, and ship it straight to them.
+        wrote it, and ship it straight to them. No more staring at a blank card. No more generic
+        messages. Just real words that actually mean something.
       </p>
       <div className="mt-4 flex flex-col items-start justify-between text-text-primary md:flex-row md:items-center">
         <div className="flex flex-wrap items-center gap-2">
