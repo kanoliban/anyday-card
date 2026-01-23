@@ -80,7 +80,7 @@ export function Pricing() {
                 variant={tier.popular ? 'secondary' : 'primary'}
                 className="w-full"
               >
-                <Link href="/create">{tier.cta}</Link>
+                <Link href="/create/wizard">{tier.cta}</Link>
               </Button>
             </motion.div>
           ))}
