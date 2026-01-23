@@ -48,8 +48,13 @@ function WizardContent() {
   }, [startWizard, resetWizard]);
 
   const currentQuestion = useMemo(
-    () => questions.find((q) => q.step === wizardStep),
-    [wizardStep]
+    () => {
+      // Find all questions for this step
+      const stepQuestions = questions.filter((q) => q.step === wizardStep);
+      // Return the one whose showIf condition passes (or has no showIf)
+      return stepQuestions.find((q) => !q.showIf || q.showIf(wizardAnswers));
+    },
+    [wizardStep, wizardAnswers]
   );
 
   // Resolve options dynamically (filters based on previous answers)
