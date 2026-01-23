@@ -81,32 +81,39 @@ export async function POST(req: Request) {
 
     const baseUrl = getBaseUrl();
 
-    // Prepare items with customization for metadata (Stripe has 500 char limit per key)
-    const itemsForMetadata = items.map((item) => ({
-      cardId: item.cardId,
-      variant: item.variant,
-      quantity: item.quantity,
-      ...(item.customization && {
-        customization: {
+    // Check if any items require shipping
+    const hasPhysicalItems = items.some((item) => item.variant === 'physical');
+
+    // Build metadata with items split across keys to stay under Stripe's 500 char/key limit
+    const metadata: Record<string, string> = {
+      itemCount: String(items.length),
+    };
+
+    items.forEach((item, idx) => {
+      // Core item data (always fits in 500 chars)
+      metadata[`item_${idx}_core`] = JSON.stringify({
+        cardId: item.cardId,
+        variant: item.variant,
+        quantity: item.quantity,
+      });
+
+      // Customization data split into separate key
+      if (item.customization) {
+        metadata[`item_${idx}_custom`] = JSON.stringify({
           recipientName: item.customization.recipientName,
           relationship: item.customization.relationship,
           occasion: item.customization.occasion,
-          message: item.customization.message.slice(0, 400), // Truncate if needed
-        },
-      }),
-    }));
-
-    // Check if any items require shipping
-    const hasPhysicalItems = items.some((item) => item.variant === 'physical');
+          message: item.customization.message.slice(0, 350), // Leave room for JSON overhead
+        });
+      }
+    });
 
     const session = await getStripe().checkout.sessions.create({
       mode: 'payment',
       line_items: lineItems,
       success_url: `${baseUrl}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/shop`,
-      metadata: {
-        items: JSON.stringify(itemsForMetadata),
-      },
+      metadata,
       // Collect shipping address for physical items
       ...(hasPhysicalItems && {
         shipping_address_collection: {

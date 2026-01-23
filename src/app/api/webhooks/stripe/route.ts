@@ -62,9 +62,40 @@ export async function POST(req: Request) {
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const supabase = createServiceClient();
 
-  // Parse items from session metadata
-  const itemsJson = session.metadata?.items;
-  const items = itemsJson ? JSON.parse(itemsJson) : [];
+  // Parse items from session metadata (split across keys due to Stripe's 500 char/key limit)
+  const metadata = session.metadata ?? {};
+  const itemCount = parseInt(metadata.itemCount ?? '0', 10);
+  const items: Array<{
+    cardId: string;
+    variant: string;
+    quantity: number;
+    customization?: {
+      recipientName: string;
+      relationship: string;
+      occasion: string;
+      message: string;
+    };
+  }> = [];
+
+  for (let i = 0; i < itemCount; i++) {
+    const coreJson = metadata[`item_${i}_core`];
+    const customJson = metadata[`item_${i}_custom`];
+
+    if (coreJson) {
+      const core = JSON.parse(coreJson);
+      const item: (typeof items)[0] = {
+        cardId: core.cardId,
+        variant: core.variant,
+        quantity: core.quantity,
+      };
+
+      if (customJson) {
+        item.customization = JSON.parse(customJson);
+      }
+
+      items.push(item);
+    }
+  }
 
   // Extract shipping address if present (type assertion needed for checkout session)
   const shippingDetails = (
