@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import Button from '~/src/components/ui/Button';
+import CartButton from '../../shop/components/CartButton';
 
 import MainHeader from '../../components/Header';
 import { collectionFilters, type CollectionFilter } from '~/src/app/create/constants';
@@ -23,17 +24,20 @@ export default function Header() {
 
   return (
     <MainHeader>
-      <div className="filters flex flex-nowrap items-center gap-1 overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none md:overflow-visible">
-        {collectionFilters.map((f) => (
-          <Button
-            key={f}
-            asChild
-            variant={f === filter || (f === 'all' && !filter) ? 'secondary' : 'primary'}
-            className="shrink-0 text-xs md:text-sm"
-          >
-            <Link href={f === 'all' ? `/cards` : `/cards?f=${f}`}>{filterLabels[f]}</Link>
-          </Button>
-        ))}
+      <div className="flex w-full items-center justify-between gap-4">
+        <div className="filters flex flex-nowrap items-center gap-1 overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none md:overflow-visible">
+          {collectionFilters.map((f) => (
+            <Button
+              key={f}
+              asChild
+              variant={f === filter || (f === 'all' && !filter) ? 'secondary' : 'primary'}
+              className="shrink-0 text-xs md:text-sm"
+            >
+              <Link href={f === 'all' ? `/card` : `/card?f=${f}`}>{filterLabels[f]}</Link>
+            </Button>
+          ))}
+        </div>
+        <CartButton />
       </div>
     </MainHeader>
   );

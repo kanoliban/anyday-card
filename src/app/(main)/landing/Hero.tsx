@@ -9,7 +9,7 @@ import Button from '~/src/components/ui/Button';
 
 export function Hero() {
   return (
-    <section className="relative px-6 pb-20 pt-32 lg:pb-32 lg:pt-48">
+    <section className="relative px-6 pb-20 pt-24 lg:pb-32 lg:pt-40">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-12 lg:flex-row lg:gap-20">
         {/* Left content */}
         <div className="text-center lg:w-1/2 lg:text-left">
@@ -80,8 +80,13 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          {/* Card - premium with sharp, defined edges */}
-          <div className="texture-grain edge-highlight relative overflow-hidden rounded-2xl border border-black/10 bg-panel-background p-6 shadow-premium">
+          {/* Card - premium with character */}
+          <motion.div
+            className="texture-grain edge-highlight relative overflow-hidden rounded-2xl border border-black/10 bg-panel-background p-6 shadow-premium"
+            initial={{ rotate: 2 }}
+            whileHover={{ rotate: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-theme-3">
               <img
                 src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop"
@@ -105,7 +110,7 @@ export function Hero() {
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
