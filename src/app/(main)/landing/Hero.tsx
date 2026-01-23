@@ -80,13 +80,8 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          {/* Card - premium with character */}
-          <motion.div
-            className="texture-grain edge-highlight relative overflow-hidden rounded-2xl border border-black/10 bg-panel-background p-6 shadow-premium"
-            initial={{ rotate: 2 }}
-            whileHover={{ rotate: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          {/* Card - premium with sharp, defined edges */}
+          <div className="texture-grain edge-highlight relative overflow-hidden rounded-2xl border border-black/10 bg-panel-background p-6 shadow-premium">
             <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-theme-3">
               <img
                 src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1000&auto=format&fit=crop"
@@ -110,7 +105,7 @@ export function Hero() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </section>

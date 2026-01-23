@@ -1,4 +1,5 @@
 import type {
+  FormField,
   HeartfeltDepth,
   HumorType,
   OccasionType,
@@ -8,7 +9,7 @@ import type {
   WizardStep,
 } from '../models';
 
-export type QuestionType = 'text' | 'grid' | 'pills' | 'multiSelect' | 'chips' | 'list';
+export type QuestionType = 'text' | 'textarea' | 'grid' | 'pills' | 'multiSelect' | 'chips' | 'list' | 'form';
 
 export interface QuestionOption<T = string> {
   value: T;
@@ -29,13 +30,14 @@ export interface QuestionConfig {
   options?: QuestionOption[];
   getOptions?: (answers: Record<string, unknown>) => QuestionOption[];
   showIf?: (answers: Record<string, unknown>) => boolean;
+  fields?: FormField[];
 }
 
 // Relationship categories for filtering
 export const ROMANTIC_RELATIONSHIPS: RelationshipType[] = ['partner', 'dating'];
 
 // Occasions only valid for romantic relationships
-export const ROMANTIC_ONLY_OCCASIONS: OccasionType[] = ['anniversary'];
+export const ROMANTIC_ONLY_OCCASIONS: OccasionType[] = ['anniversary', 'valentine'];
 
 // Vibes only valid for romantic relationships
 export const ROMANTIC_ONLY_VIBES: VibeType[] = ['spicy'];
@@ -56,6 +58,7 @@ export const relationshipOptions: QuestionOption<RelationshipType>[] = [
 // Occasion options with emojis
 export const occasionOptions: QuestionOption<OccasionType>[] = [
   { value: 'birthday', label: 'Their birthday', emoji: '🎂' },
+  { value: 'valentine', label: "Valentine's Day", emoji: '💝' },
   { value: 'anniversary', label: 'Our anniversary', emoji: '💑' },
   { value: 'holiday', label: 'A holiday', emoji: '🎄' },
   { value: 'support', label: "They're going through something", emoji: '🫂' },
@@ -183,6 +186,41 @@ export const questions: QuestionConfig[] = [
       getFilteredOccasions(answers.relationshipType as RelationshipType | undefined),
   },
   {
+    id: 'coupleMode',
+    step: 'coupleMode',
+    type: 'grid',
+    title: 'Is this card about you as a couple?',
+    subtitle: "We can make it feel like it's from both of you",
+    required: true,
+    options: [
+      { value: 'yes', label: "Yes, it's about us", emoji: '💑' },
+      { value: 'no', label: 'Just for them', emoji: '💌' },
+    ],
+    showIf: (answers) =>
+      ROMANTIC_RELATIONSHIPS.includes(answers.relationshipType as RelationshipType) &&
+      answers.occasion === 'valentine',
+  },
+  {
+    id: 'senderName',
+    step: 'senderName',
+    type: 'text',
+    title: "What's your name?",
+    subtitle: 'So we can personalize the message from you',
+    placeholder: 'Your name',
+    required: true,
+    showIf: (answers) => answers.coupleMode === 'yes',
+  },
+  {
+    id: 'coupleStory',
+    step: 'coupleStory',
+    type: 'textarea',
+    title: 'What makes your love story special?',
+    subtitle: 'Share one detail we can weave into your message',
+    placeholder: 'How you met, an inside joke, a pet name, a favorite memory...',
+    required: false,
+    showIf: (answers) => answers.coupleMode === 'yes',
+  },
+  {
     id: 'vibes',
     step: 'vibe',
     type: 'multiSelect',
@@ -228,6 +266,390 @@ export const questions: QuestionConfig[] = [
     required: false,
     options: quickTraitOptions,
   },
+  // Relationship-specific detail questions
+  {
+    id: 'datingDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about them',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'dating',
+    fields: [
+      {
+        id: 'datingDuration',
+        type: 'pills',
+        label: 'How long have you been seeing each other?',
+        options: [
+          { value: 'justMet', label: 'Just met' },
+          { value: 'fewDates', label: 'A few dates' },
+          { value: 'coupleMonths', label: 'Couple months' },
+          { value: 'gettingSerious', label: 'Getting serious' },
+        ],
+      },
+      {
+        id: 'howMet',
+        type: 'text',
+        label: 'How did you meet?',
+        placeholder: 'At a party, on an app, through friends...',
+      },
+      {
+        id: 'whatLikeMost',
+        type: 'text',
+        label: 'What do you like most about them?',
+        placeholder: 'Their laugh, how they listen, their ambition...',
+      },
+      {
+        id: 'datingIntensity',
+        type: 'pills',
+        label: 'How intense should the card be?',
+        options: [
+          { value: 'light', label: 'Keep it light' },
+          { value: 'flirty', label: 'Flirty' },
+          { value: 'earnest', label: 'Earnest' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'partnerDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about your partner',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'partner',
+    fields: [
+      {
+        id: 'partnerType',
+        type: 'pills',
+        label: 'What type of partner?',
+        options: [
+          { value: 'spouse', label: 'Spouse' },
+          { value: 'longTermPartner', label: 'Long-term partner' },
+          { value: 'engaged', label: 'Engaged' },
+        ],
+      },
+      {
+        id: 'partnerDuration',
+        type: 'pills',
+        label: 'How long have you been together?',
+        options: [
+          { value: 'under1Year', label: 'Under 1 year' },
+          { value: '1to5Years', label: '1-5 years' },
+          { value: '5to10Years', label: '5-10 years' },
+          { value: 'over10Years', label: '10+ years' },
+        ],
+      },
+      {
+        id: 'recentMoment',
+        type: 'text',
+        label: 'A recent moment you loved together?',
+        placeholder: 'That trip, the lazy Sunday, a random Tuesday...',
+      },
+      {
+        id: 'theirThing',
+        type: 'text',
+        label: 'What\'s "their thing"?',
+        placeholder: 'Always dancing, the morning coffee ritual, their laugh...',
+      },
+      {
+        id: 'partnerInsideJoke',
+        type: 'text',
+        label: 'Any inside joke or pet name?',
+        placeholder: 'Something only you two would get...',
+      },
+    ],
+  },
+  {
+    id: 'friendDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about your friend',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'friend',
+    fields: [
+      {
+        id: 'friendDuration',
+        type: 'pills',
+        label: 'How long have you been friends?',
+        options: [
+          { value: 'newFriend', label: 'Pretty new' },
+          { value: 'fewYears', label: 'A few years' },
+          { value: 'longTime', label: 'A long time' },
+          { value: 'forever', label: 'Forever' },
+        ],
+      },
+      {
+        id: 'friendHowMet',
+        type: 'text',
+        label: 'How did you meet?',
+        placeholder: 'School, work, through someone, randomly...',
+      },
+      {
+        id: 'friendSpecial',
+        type: 'text',
+        label: 'What makes them a good friend?',
+        placeholder: 'Always there, makes me laugh, no judgment...',
+      },
+      {
+        id: 'friendMemory',
+        type: 'text',
+        label: 'A memory you share?',
+        placeholder: 'That road trip, the late night talks, that one time...',
+      },
+    ],
+  },
+  {
+    id: 'parentDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about your parent',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'parent',
+    fields: [
+      {
+        id: 'whichParent',
+        type: 'pills',
+        label: 'Which parent?',
+        options: [
+          { value: 'mom', label: 'Mom' },
+          { value: 'dad', label: 'Dad' },
+          { value: 'stepParent', label: 'Step-parent' },
+          { value: 'parentFigure', label: 'Parent figure' },
+        ],
+      },
+      {
+        id: 'parentMeaning',
+        type: 'text',
+        label: 'What do they mean to you?',
+        placeholder: 'My rock, my biggest supporter, always believed in me...',
+      },
+      {
+        id: 'parentLesson',
+        type: 'text',
+        label: 'A lesson they taught you?',
+        placeholder: 'Work hard, be kind, never give up...',
+      },
+      {
+        id: 'parentAlways',
+        type: 'text',
+        label: '"They always..."',
+        placeholder: 'Know what to say, make the best food, call at the right time...',
+      },
+    ],
+  },
+  {
+    id: 'childDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about your child',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'child',
+    fields: [
+      {
+        id: 'childAge',
+        type: 'pills',
+        label: 'How old are they?',
+        options: [
+          { value: 'baby', label: 'Baby/Toddler' },
+          { value: 'kid', label: 'Kid (3-12)' },
+          { value: 'teen', label: 'Teenager' },
+          { value: 'adult', label: 'Adult' },
+        ],
+      },
+      {
+        id: 'childPhase',
+        type: 'text',
+        label: 'What phase are they in?',
+        placeholder: 'Starting school, learning to drive, first job...',
+      },
+      {
+        id: 'childProud',
+        type: 'text',
+        label: 'Something that made you proud?',
+        placeholder: 'How they handled something, their kindness, their growth...',
+      },
+      {
+        id: 'childKindOf',
+        type: 'text',
+        label: '"They\'re the kind of kid who..."',
+        placeholder: 'Makes friends easily, asks a million questions, lights up a room...',
+      },
+    ],
+  },
+  {
+    id: 'siblingDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about your sibling',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'sibling',
+    fields: [
+      {
+        id: 'siblingType',
+        type: 'pills',
+        label: 'What kind of sibling?',
+        options: [
+          { value: 'brother', label: 'Brother' },
+          { value: 'sister', label: 'Sister' },
+          { value: 'stepSibling', label: 'Step-sibling' },
+          { value: 'halfSibling', label: 'Half-sibling' },
+        ],
+      },
+      {
+        id: 'birthOrder',
+        type: 'pills',
+        label: 'Birth order?',
+        options: [
+          { value: 'older', label: 'They\'re older' },
+          { value: 'younger', label: 'They\'re younger' },
+          { value: 'twin', label: 'We\'re twins' },
+        ],
+      },
+      {
+        id: 'siblingDynamic',
+        type: 'text',
+        label: 'What\'s your dynamic now?',
+        placeholder: 'Super close, reconnecting, friendly rivals...',
+      },
+      {
+        id: 'siblingMemory',
+        type: 'text',
+        label: 'A childhood memory?',
+        placeholder: 'Building forts, fighting over the remote, road trips...',
+      },
+      {
+        id: 'siblingJoke',
+        type: 'text',
+        label: 'An inside joke?',
+        placeholder: 'Something that still makes you both laugh...',
+      },
+    ],
+  },
+  {
+    id: 'grandparentDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about your grandparent',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'grandparent',
+    fields: [
+      {
+        id: 'whichGrandparent',
+        type: 'pills',
+        label: 'Which grandparent?',
+        options: [
+          { value: 'grandma', label: 'Grandma' },
+          { value: 'grandpa', label: 'Grandpa' },
+          { value: 'nana', label: 'Nana/Nanna' },
+          { value: 'papa', label: 'Papa/Pop' },
+        ],
+      },
+      {
+        id: 'grandparentStyle',
+        type: 'pills',
+        label: 'Their relationship style?',
+        options: [
+          { value: 'spoiler', label: 'The spoiler' },
+          { value: 'storyteller', label: 'The storyteller' },
+          { value: 'advisor', label: 'The wise advisor' },
+          { value: 'adventurer', label: 'Still adventurous' },
+        ],
+      },
+      {
+        id: 'grandparentMemory',
+        type: 'text',
+        label: 'A memory with them?',
+        placeholder: 'Summer visits, their cooking, learning from them...',
+      },
+      {
+        id: 'grandparentAlways',
+        type: 'text',
+        label: '"They always..."',
+        placeholder: 'Have candy, tell the best stories, give the best hugs...',
+      },
+    ],
+  },
+  {
+    id: 'professionalDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about them',
+    subtitle: 'These details help us write something appropriate',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'professional',
+    fields: [
+      {
+        id: 'professionalWho',
+        type: 'pills',
+        label: 'Who are they?',
+        options: [
+          { value: 'boss', label: 'Boss/Manager' },
+          { value: 'coworker', label: 'Coworker' },
+          { value: 'mentor', label: 'Mentor' },
+          { value: 'client', label: 'Client' },
+          { value: 'employee', label: 'Employee' },
+        ],
+      },
+      {
+        id: 'professionalContext',
+        type: 'text',
+        label: 'What\'s the context?',
+        placeholder: 'Leaving the company, promotion, project completion...',
+      },
+      {
+        id: 'professionalDid',
+        type: 'text',
+        label: 'What did they do?',
+        placeholder: 'Helped me grow, delivered an amazing project, supported the team...',
+      },
+      {
+        id: 'professionalTone',
+        type: 'pills',
+        label: 'How formal should it be?',
+        options: [
+          { value: 'casual', label: 'Pretty casual' },
+          { value: 'warmPro', label: 'Warm but professional' },
+          { value: 'formal', label: 'Formal' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'otherDetails',
+    step: 'relationshipQuestions',
+    type: 'form',
+    title: 'Tell us about them',
+    subtitle: 'These details help us write something personal',
+    required: false,
+    showIf: (answers) => answers.relationshipType === 'other',
+    fields: [
+      {
+        id: 'otherRelationship',
+        type: 'text',
+        label: 'How do you know them?',
+        placeholder: 'Neighbor, teacher, coach, distant relative...',
+      },
+      {
+        id: 'otherContext',
+        type: 'text',
+        label: 'What\'s the context for this card?',
+        placeholder: 'They helped me out, celebrating something, just grateful...',
+      },
+      {
+        id: 'otherSpecial',
+        type: 'text',
+        label: 'What makes them special?',
+        placeholder: 'Their kindness, their impact on me, what they did...',
+      },
+    ],
+  },
 ];
 
 // Step order for navigation
@@ -235,6 +657,10 @@ export const stepOrder: WizardStep[] = [
   'name',
   'relationship',
   'occasion',
+  'coupleMode',
+  'senderName',
+  'coupleStory',
+  'relationshipQuestions',
   'vibe',
   'humorType',
   'heartfeltDepth',
@@ -252,10 +678,20 @@ export function getNextStep(
 
   for (let i = currentIndex + 1; i < stepOrder.length; i++) {
     const nextStep = stepOrder[i];
-    const question = questions.find((q) => q.step === nextStep);
+    // Find ALL questions for this step (handles multiple conditional questions like relationshipQuestions)
+    const stepQuestions = questions.filter((q) => q.step === nextStep);
 
-    // If no question for this step or showIf passes, use this step
-    if (!question?.showIf || question.showIf(answers)) {
+    if (stepQuestions.length === 0) {
+      // No questions for this step (like preview), include it
+      return nextStep;
+    }
+
+    // Check if ANY question for this step should be shown
+    const hasVisibleQuestion = stepQuestions.some(
+      (q) => !q.showIf || q.showIf(answers)
+    );
+
+    if (hasVisibleQuestion) {
       return nextStep;
     }
   }
@@ -273,10 +709,20 @@ export function getPrevStep(
 
   for (let i = currentIndex - 1; i >= 0; i--) {
     const prevStep = stepOrder[i];
-    const question = questions.find((q) => q.step === prevStep);
+    // Find ALL questions for this step (handles multiple conditional questions like relationshipQuestions)
+    const stepQuestions = questions.filter((q) => q.step === prevStep);
 
-    // If no question for this step or showIf passes, use this step
-    if (!question?.showIf || question.showIf(answers)) {
+    if (stepQuestions.length === 0) {
+      // No questions for this step, include it
+      return prevStep;
+    }
+
+    // Check if ANY question for this step should be shown
+    const hasVisibleQuestion = stepQuestions.some(
+      (q) => !q.showIf || q.showIf(answers)
+    );
+
+    if (hasVisibleQuestion) {
       return prevStep;
     }
   }
@@ -290,8 +736,9 @@ export function calculateProgress(
   answers: Record<string, unknown>
 ): number {
   const activeSteps = stepOrder.filter((step) => {
-    const question = questions.find((q) => q.step === step);
-    return !question?.showIf || question.showIf(answers);
+    const stepQuestions = questions.filter((q) => q.step === step);
+    // Step is active if it has no questions OR any question should be shown
+    return stepQuestions.length === 0 || stepQuestions.some((q) => !q.showIf || q.showIf(answers));
   });
 
   const currentIndex = activeSteps.indexOf(currentStep);

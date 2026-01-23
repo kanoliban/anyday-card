@@ -8,7 +8,7 @@ import { cn } from '~/src/util';
 
 import type { WizardAnswers } from '../models';
 import { useCardStore } from '../store';
-import { ChipSelect, GridSelect, ListSelect, MultiSelect, TextInput } from './inputs';
+import { ChipSelect, GridSelect, ListSelect, MultiSelect, TextareaInput, TextInput } from './inputs';
 import {
   calculateProgress,
   getNextStep,
@@ -107,6 +107,18 @@ export default function WizardShell({ className, onComplete }: Props) {
       case 'text':
         return (
           <TextInput
+            value={(answer as string) ?? ''}
+            onChange={(value) =>
+              setWizardAnswer(currentQuestion.id as keyof WizardAnswers, value)
+            }
+            placeholder={currentQuestion.placeholder}
+            autoFocus
+          />
+        );
+
+      case 'textarea':
+        return (
+          <TextareaInput
             value={(answer as string) ?? ''}
             onChange={(value) =>
               setWizardAnswer(currentQuestion.id as keyof WizardAnswers, value)

@@ -8,7 +8,7 @@ export function Features() {
   return (
     <section
       id="features"
-      className="relative z-10 overflow-hidden bg-theme-4 py-24 text-text-contrast"
+      className="texture-grain relative z-10 overflow-hidden bg-theme-4 py-24 text-text-contrast"
     >
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-16 px-6 lg:flex-row">
         {/* Left content */}
@@ -36,7 +36,7 @@ export function Features() {
                   transition={{ delay: i * 0.1 }}
                   className="flex gap-4"
                 >
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-theme-1/20 text-theme-1">
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
                     <Icon size={24} weight="duotone" />
                   </div>
                   <div>
@@ -64,7 +64,7 @@ export function Features() {
               initial={{ y: 20 }}
               whileInView={{ y: 32 }}
               viewport={{ once: true }}
-              className="translate-y-8 overflow-hidden rounded-xl border border-white/20 bg-white/5 shadow-lg"
+              className="texture-grain edge-highlight translate-y-8 overflow-hidden rounded-xl border border-white/20 bg-white/10 shadow-xl"
             >
               <div className="aspect-[4/5] overflow-hidden">
                 <img
@@ -80,7 +80,7 @@ export function Features() {
             </motion.div>
 
             {/* Card 2 - Thank you theme */}
-            <div className="overflow-hidden rounded-xl border border-white/20 bg-white/5 shadow-lg">
+            <div className="texture-grain edge-highlight overflow-hidden rounded-xl border border-white/20 bg-white/10 shadow-xl">
               <div className="aspect-[4/5] overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop"

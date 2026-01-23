@@ -6,7 +6,7 @@ export type CardPricing = {
   currency: 'USD';
 };
 
-export type CardCollectionType = 'celebrations' | 'gratitude' | 'seasonal' | 'everyday';
+export type CardCollectionType = 'celebrations' | 'gratitude' | 'seasonal' | 'everyday' | 'valentine';
 
 export type Card = {
   id: string;
@@ -45,6 +45,9 @@ export type WizardStep =
   | 'name'
   | 'relationship'
   | 'occasion'
+  | 'coupleMode'
+  | 'senderName'
+  | 'coupleStory'
   | 'vibe'
   | 'humorType'
   | 'heartfeltDepth'
@@ -85,7 +88,8 @@ export type OccasionType =
   | 'justBecause'
   | 'apology'
   | 'thanks'
-  | 'congratulations';
+  | 'congratulations'
+  | 'valentine';
 
 export type HumorType =
   | 'insideJokes'
@@ -96,6 +100,23 @@ export type HumorType =
   | 'wholesomeSilly';
 
 export type HeartfeltDepth = 'warmLight' | 'feelSeen' | 'mightCry';
+
+// Form field types for relationship-specific questions
+export type FormFieldType = 'pills' | 'text' | 'textarea';
+
+export interface FormFieldOption {
+  value: string;
+  label: string;
+}
+
+export interface FormField {
+  id: string;
+  type: FormFieldType;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  options?: FormFieldOption[];
+}
 
 export type QuickTrait =
   | 'dogPerson'
@@ -127,6 +148,10 @@ export interface WizardAnswers {
   humorType?: HumorType;
   heartfeltDepth?: HeartfeltDepth;
   quickTraits: QuickTrait[];
+  // Valentine couple mode fields
+  coupleMode?: 'yes' | 'no';
+  senderName?: string;
+  coupleStory?: string;
   // Relationship-specific fields (dynamic)
   [key: string]: string | string[] | undefined;
 }

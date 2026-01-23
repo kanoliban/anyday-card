@@ -13,6 +13,7 @@ const filterLabels: Record<CollectionFilter, string> = {
   celebrations: 'Celebrations',
   gratitude: 'Thank You',
   seasonal: 'Seasonal',
+  valentine: "Valentine's",
   everyday: 'Everyday',
 };
 

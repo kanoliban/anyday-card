@@ -37,6 +37,56 @@ export function buildTraitsContext(quickTraits?: string[]): string {
   return `\nAbout them: ${descriptions}.`;
 }
 
+/** Human-readable labels for relationship detail fields */
+const FIELD_LABELS: Record<string, string> = {
+  // Dating
+  datingDuration: 'Been dating',
+  howMet: 'How they met',
+  whatLikeMost: 'What they like about them',
+  datingIntensity: 'Card intensity',
+  // Partner
+  partnerType: 'Partner type',
+  partnerDuration: 'Together for',
+  recentMoment: 'Recent moment together',
+  theirThing: 'Their thing',
+  partnerInsideJoke: 'Inside joke',
+  // Friend
+  friendDuration: 'Friends for',
+  friendHowMet: 'How they met',
+  friendSpecial: 'What makes them a good friend',
+  friendMemory: 'A shared memory',
+  // Parent
+  whichParent: 'Which parent',
+  parentMeaning: 'What they mean',
+  parentLesson: 'A lesson they taught',
+  parentAlways: 'They always',
+  // Child
+  childAge: 'Age',
+  childPhase: 'Current phase',
+  childProud: 'Proud of',
+  childKindOf: 'Kind of kid',
+  // Sibling
+  siblingType: 'Sibling type',
+  birthOrder: 'Birth order',
+  siblingDynamic: 'Their dynamic',
+  siblingMemory: 'Childhood memory',
+  siblingJoke: 'Inside joke',
+  // Grandparent
+  whichGrandparent: 'Which grandparent',
+  grandparentStyle: 'Relationship style',
+  grandparentMemory: 'A memory',
+  grandparentAlways: 'They always',
+  // Professional
+  professionalWho: 'Who they are',
+  professionalContext: 'Context',
+  professionalDid: 'What they did',
+  professionalTone: 'Tone',
+  // Other
+  otherRelationship: 'How they know them',
+  otherContext: 'Context',
+  otherSpecial: 'What makes them special',
+};
+
 /**
  * Build relationship details context from dynamic Q&A answers
  */
@@ -47,12 +97,18 @@ export function buildRelationshipContext(
     return '';
   }
 
-  const values = Object.values(relationshipDetails).filter(Boolean);
-  if (values.length === 0) {
+  const entries = Object.entries(relationshipDetails)
+    .filter(([, value]) => value && value.trim())
+    .map(([key, value]) => {
+      const label = FIELD_LABELS[key] || key;
+      return `${label}: ${value}`;
+    });
+
+  if (entries.length === 0) {
     return '';
   }
 
-  return `\nPersonal details: ${values.join('. ')}.`;
+  return `\nPersonal details shared:\n- ${entries.join('\n- ')}`;
 }
 
 /**

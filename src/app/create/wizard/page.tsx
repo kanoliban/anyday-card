@@ -3,9 +3,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useMemo } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { cn } from '~/src/util';
+import { Sparkles, RefreshCw } from 'lucide-react';
 
 import { cards } from '../constants';
 import type { WizardAnswers } from '../models';
@@ -32,9 +33,17 @@ function WizardContent() {
   const startWizard = useCardStore((s) => s.startWizard);
   const resetWizard = useCardStore((s) => s.resetWizard);
 
+  // Track initialization to prevent stale state flash
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Message generation state
+  const [generatedMessage, setGeneratedMessage] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+
   // Initialize wizard on mount
   useEffect(() => {
     startWizard();
+    setIsInitialized(true);
     return () => resetWizard();
   }, [startWizard, resetWizard]);
 
@@ -153,29 +162,182 @@ function WizardContent() {
     }
   }, [canGoNext, handleNext]);
 
-  // Preview step - redirect to generate
+  const handleFormChange = useCallback(
+    (fieldId: string, value: string) => {
+      setWizardAnswer(fieldId as keyof WizardAnswers, value);
+    },
+    [setWizardAnswer]
+  );
+
+  const handleGenerateMessage = useCallback(async () => {
+    setIsGenerating(true);
+    try {
+      // Extract relationship-specific details from wizard answers
+      const relationshipDetails: Record<string, string> = {};
+      const relationshipFieldKeys = [
+        // Dating
+        'datingDuration', 'howMet', 'whatLikeMost', 'datingIntensity',
+        // Partner
+        'partnerType', 'partnerDuration', 'recentMoment', 'theirThing', 'partnerInsideJoke',
+        // Friend
+        'friendDuration', 'friendHowMet', 'friendSpecial', 'friendMemory',
+        // Parent
+        'whichParent', 'parentMeaning', 'parentLesson', 'parentAlways',
+        // Child
+        'childAge', 'childPhase', 'childProud', 'childKindOf',
+        // Sibling
+        'siblingType', 'birthOrder', 'siblingDynamic', 'siblingMemory', 'siblingJoke',
+        // Grandparent
+        'whichGrandparent', 'grandparentStyle', 'grandparentMemory', 'grandparentAlways',
+        // Professional
+        'professionalWho', 'professionalContext', 'professionalDid', 'professionalTone',
+        // Other
+        'otherRelationship', 'otherContext', 'otherSpecial',
+      ];
+
+      for (const key of relationshipFieldKeys) {
+        const value = wizardAnswers[key as keyof WizardAnswers];
+        if (typeof value === 'string' && value.trim()) {
+          relationshipDetails[key] = value;
+        }
+      }
+
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientName: wizardAnswers.name,
+          relationship: wizardAnswers.relationshipType,
+          occasion: wizardAnswers.occasion,
+          vibes: wizardAnswers.vibes,
+          humorType: wizardAnswers.humorType,
+          heartfeltDepth: wizardAnswers.heartfeltDepth,
+          quickTraits: wizardAnswers.quickTraits,
+          coupleMode: wizardAnswers.coupleMode,
+          senderName: wizardAnswers.senderName,
+          coupleStory: wizardAnswers.coupleStory,
+          relationshipDetails: Object.keys(relationshipDetails).length > 0 ? relationshipDetails : undefined,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGeneratedMessage(data.message);
+      }
+    } catch {
+      // Silently fail
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [wizardAnswers]);
+
+  const handleViewCards = useCallback(() => {
+    // Store message in session for the card page to use
+    if (generatedMessage) {
+      sessionStorage.setItem('wizardMessage', generatedMessage);
+      sessionStorage.setItem('wizardAnswers', JSON.stringify(wizardAnswers));
+    }
+    router.push('/card');
+  }, [generatedMessage, wizardAnswers, router]);
+
+  // Show loading until initialized to prevent stale state flash
+  if (!isInitialized) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-stone-50">
+        <div className="size-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-800" />
+      </div>
+    );
+  }
+
+  // Preview step - generate message and show results
   if (wizardStep === 'preview') {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-stone-50 p-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center"
-        >
-          <div className="mb-6 text-6xl">✨</div>
-          <h1 className="mb-3 text-3xl font-medium text-stone-800">
-            Let&apos;s write your message
-          </h1>
-          <p className="mb-8 max-w-md text-lg text-stone-600">
-            Based on what you told us, we&apos;ll craft something that sounds like you.
-          </p>
+      <div className="flex min-h-dvh flex-col bg-stone-50">
+        {/* Header */}
+        <header className="sticky top-0 z-10 flex items-center justify-between bg-stone-50/95 px-4 py-4 backdrop-blur-sm sm:px-6">
           <button
             onClick={handleBack}
-            className="text-stone-500 hover:text-stone-700"
+            className="flex size-10 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-stone-200 hover:text-stone-700"
           >
-            ← Go back and change something
+            <ArrowLeft className="size-5" />
           </button>
-        </motion.div>
+          <div className="mx-4 h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200 sm:mx-8">
+            <motion.div
+              className="h-full bg-stone-700"
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+          <div className="w-10" />
+        </header>
+
+        <main className="flex flex-1 flex-col items-center justify-center px-4 pb-24 pt-8 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-lg text-center"
+          >
+            {!generatedMessage && !isGenerating && (
+              <>
+                <div className="mb-6 text-6xl">✨</div>
+                <h1 className="mb-3 text-3xl font-medium text-stone-800">
+                  Let&apos;s write your message
+                </h1>
+                <p className="mb-8 text-lg text-stone-600">
+                  Based on what you told us, we&apos;ll craft something that sounds like you.
+                </p>
+                <button
+                  onClick={handleGenerateMessage}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-stone-800 py-4 text-lg font-medium text-white transition-all hover:bg-stone-700"
+                >
+                  <Sparkles className="size-5" />
+                  Generate Message
+                </button>
+              </>
+            )}
+
+            {isGenerating && (
+              <>
+                <div className="mb-6 animate-pulse text-6xl">✨</div>
+                <h1 className="mb-3 text-3xl font-medium text-stone-800">
+                  Writing your message...
+                </h1>
+                <p className="text-lg text-stone-600">
+                  Just a moment while we craft something special.
+                </p>
+              </>
+            )}
+
+            {generatedMessage && !isGenerating && (
+              <>
+                <h1 className="mb-6 text-2xl font-medium text-stone-800">
+                  Here&apos;s your message for {wizardAnswers.name}
+                </h1>
+                <div className="mb-8 rounded-2xl border border-stone-200 bg-white p-6 text-left shadow-sm">
+                  <p className="whitespace-pre-wrap text-lg leading-relaxed text-stone-700">
+                    {generatedMessage}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={handleViewCards}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-stone-800 py-4 text-lg font-medium text-white transition-all hover:bg-stone-700"
+                  >
+                    Choose a Card
+                  </button>
+                  <button
+                    onClick={handleGenerateMessage}
+                    className="flex w-full items-center justify-center gap-2 rounded-full border border-stone-300 bg-white py-3 text-stone-700 transition-all hover:bg-stone-50"
+                  >
+                    <RefreshCw className="size-4" />
+                    Try a different message
+                  </button>
+                </div>
+              </>
+            )}
+          </motion.div>
+        </main>
       </div>
     );
   }
@@ -252,6 +414,28 @@ function WizardContent() {
                       )}
                     >
                       Continue
+                    </button>
+                  </div>
+                )}
+
+                {currentQuestion.type === 'textarea' && (
+                  <div className="mx-auto max-w-lg">
+                    <textarea
+                      value={(wizardAnswers[currentQuestion.id as keyof WizardAnswers] as string) ?? ''}
+                      onChange={(e) => handleTextChange(e.target.value)}
+                      placeholder={currentQuestion.placeholder}
+                      autoFocus
+                      rows={4}
+                      className="w-full resize-none rounded-xl border-2 border-stone-300 bg-white px-4 py-4 text-lg text-stone-800 placeholder:text-stone-400 focus:border-stone-700 focus:outline-none"
+                    />
+                    <button
+                      onClick={handleNext}
+                      className={cn(
+                        'mt-8 w-full rounded-full py-4 text-lg font-medium transition-all',
+                        'bg-stone-800 text-white hover:bg-stone-700'
+                      )}
+                    >
+                      {canGoNext ? 'Continue' : 'Skip'}
                     </button>
                   </div>
                 )}
@@ -445,6 +629,86 @@ function WizardContent() {
                       {canGoNext ? 'Continue' : 'Skip'}
                     </button>
                   </>
+                )}
+
+                {currentQuestion.type === 'form' && currentQuestion.fields && (
+                  <div className="mx-auto max-w-lg">
+                    <div className="flex flex-col gap-8">
+                      {currentQuestion.fields.map((field, index) => (
+                        <motion.div
+                          key={field.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="flex flex-col gap-3"
+                        >
+                          <label className="text-sm font-medium text-stone-600">
+                            {field.label}
+                          </label>
+
+                          {field.type === 'pills' && field.options && (
+                            <div className="flex flex-wrap gap-2">
+                              {field.options.map((option) => {
+                                const isSelected = wizardAnswers[field.id as keyof WizardAnswers] === option.value;
+                                return (
+                                  <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => handleFormChange(field.id, option.value)}
+                                    className={cn(
+                                      'rounded-full border px-4 py-2 text-sm font-medium transition-all',
+                                      'focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2',
+                                      isSelected
+                                        ? 'border-stone-800 bg-stone-800 text-white'
+                                        : 'border-stone-300 bg-white text-stone-700 hover:border-stone-400 hover:bg-stone-50'
+                                    )}
+                                  >
+                                    {option.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {field.type === 'text' && (
+                            <input
+                              type="text"
+                              value={(wizardAnswers[field.id as keyof WizardAnswers] as string) ?? ''}
+                              onChange={(e) => handleFormChange(field.id, e.target.value)}
+                              placeholder={field.placeholder}
+                              className={cn(
+                                'w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-800',
+                                'placeholder:text-stone-400',
+                                'focus:border-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-200',
+                                'transition-colors'
+                              )}
+                            />
+                          )}
+
+                          {field.type === 'textarea' && (
+                            <textarea
+                              value={(wizardAnswers[field.id as keyof WizardAnswers] as string) ?? ''}
+                              onChange={(e) => handleFormChange(field.id, e.target.value)}
+                              placeholder={field.placeholder}
+                              rows={3}
+                              className={cn(
+                                'w-full resize-none rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-800',
+                                'placeholder:text-stone-400',
+                                'focus:border-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-200',
+                                'transition-colors'
+                              )}
+                            />
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={handleNext}
+                      className="mt-10 w-full rounded-full bg-stone-800 py-4 text-lg font-medium text-white transition-all hover:bg-stone-700"
+                    >
+                      Continue
+                    </button>
+                  </div>
                 )}
               </div>
             </motion.div>
