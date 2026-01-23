@@ -154,30 +154,47 @@ Claude automatically reads this file — no need for `git status` to "sync" cont
 
 ## Current Status
 
-**Last updated:** 2025-01-22
+**Last updated:** 2026-01-22
 
 **Recent changes:**
-- Switched AI generation from Anthropic to Google Gemini (`gemini-2.0-flash`)
-- Configured Stripe webhook handler (`/api/webhooks/stripe`)
-- Added `STRIPE_WEBHOOK_SECRET` to `.env.local`
-- Fixed Turbopack root configuration (prevents compilation hangs)
-- Updated CLAUDE.md to reflect current architecture
+- **ADC Foundation Model v1.0 implemented** — versioned prompt composition system
+  - Created `src/lib/adc/` with modular component architecture
+  - Composition engine combines tones, traits, styles, occasions
+  - Refactored `/api/generate` to use ADC library
+  - Added `/api/generate-image` endpoint for image prompt composition
+  - Version tracking (`ADC_VERSION = '1.0.0'`) in all API responses
+  - Structured logging with `[ADC]` prefix for analytics
 
 **Completed features:**
 - Wizard flow at `/create` (name, relationship, occasion, vibe, traits)
-- AI message generation (Gemini with fallback templates)
+- AI message generation (Gemini + ADC Foundation Model)
+- Image prompt composition via ADC
 - Card gallery at `/card`
 - Shopping cart and Stripe checkout
 - Webhook handler saves orders to Supabase
+- Lob fulfillment for physical cards
+- $2 customization fee for personalized cards
+
+**ADC Foundation Model (src/lib/adc/):**
+```
+src/lib/adc/
+├── index.ts              # Exports CURRENT_VERSION
+├── types.ts              # GenerationInput, CardStyle, Vibe, etc.
+└── v1/
+    ├── compose.ts        # Core composition engine
+    ├── components/       # tones, traits, occasions, styles
+    └── prompts/          # text.ts, image.ts builders
+```
 
 **Next up:**
-- Lob integration for physical card printing
-- Email delivery for digital cards
-- End-to-end purchase flow testing
+- Email delivery for digital cards (SendGrid integration)
+- Production deployment checklist
+- Lob webhook for delivery tracking
+- ADC v1.1: Quality refinements based on user feedback
 
 **Known issues:**
-- Gemini API quota may be exceeded (fallback messages will be used)
-- `Libertinus Serif` font fallback warning (cosmetic, doesn't affect functionality)
+- Pre-existing type error in `src/app/api/webhooks/stripe/route.ts:161` (variant type)
+- `Libertinus Serif` font fallback warning (cosmetic)
 
 **Local development:**
 ```bash
