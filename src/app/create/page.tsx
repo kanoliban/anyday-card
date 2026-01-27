@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import ClientRendered from '~/src/components/ClientRendered';
 import { cn } from '~/src/util';
@@ -25,7 +26,9 @@ export default function CardsPage() {
     >
       <style>{`:root{background:#f5f5f4 !important;}`}</style>
       <div className="overflow-y-auto overflow-x-clip scrollbar-thin scrollbar-track-stone-100 scrollbar-thumb-stone-300">
-        <Description className="mx-auto max-w-xl px-4 pt-4 lg:pb-10 lg:pt-5" />
+        <Suspense>
+          <Description className="mx-auto max-w-xl px-4 pt-4 lg:pb-10 lg:pt-5" />
+        </Suspense>
       </div>
       <StampsContainer />
       <SVGFilters className="pointer-events-none absolute" />
