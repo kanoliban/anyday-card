@@ -2,13 +2,14 @@
 
 import { AnimatePresence, motion, MotionProps, Variants } from 'framer-motion';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import FocusLock from 'react-focus-lock';
 
 import { cn } from '~/src/util';
 
 import CartButton from '../../(main)/shop/components/CartButton';
-import { collections } from '../constants';
+import { collections, CollectionType } from '../constants';
 import { Card } from '../models';
 import { useCardStore } from '../store';
 import CardWizard from './CardWizard';
@@ -101,16 +102,33 @@ const fadeInProps: MotionProps = {
 };
 
 export default function Description({ className }: { className?: string }) {
+  const searchParams = useSearchParams();
   const selectedCardId = useCardStore((s) => s.selectedCardId);
   const collection = useCardStore((s) => s.collection);
   const wizardMode = useCardStore((s) => s.wizardMode);
   const setWizardMode = useCardStore((s) => s.setWizardMode);
+  const selectCardForWizard = useCardStore((s) => s.selectCardForWizard);
   const [animate, setAnimate] = useState(false);
   const [animated, setAnimated] = useState(false);
 
   const card = selectedCardId
     ? (collections[collection].cards.find((c) => c.id === selectedCardId) as Card)
     : null;
+
+  // Handle pre-selected card from URL param (e.g., /create?card=ghana-celebration)
+  useEffect(() => {
+    const cardId = searchParams.get('card');
+    if (!cardId) return;
+
+    // Find card across all collections and initialize atomically
+    for (const [collectionKey, collectionData] of Object.entries(collections)) {
+      const found = collectionData.cards.find((c) => c.id === cardId);
+      if (found) {
+        selectCardForWizard(cardId, collectionKey as CollectionType);
+        break;
+      }
+    }
+  }, [searchParams, selectCardForWizard]);
 
   useEffect(() => {
     if (selectedCardId) {

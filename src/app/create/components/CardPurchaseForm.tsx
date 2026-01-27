@@ -31,7 +31,7 @@ export default function CardPurchaseForm({ card, className }: Props) {
   }
 
   function handleCustomize() {
-    router.push(`/create/wizard?card=${card.id}`);
+    router.push(`/create?card=${card.id}`);
   }
 
   return (

@@ -412,6 +412,40 @@ export default function Cards({ className, ...props }: ComponentProps<typeof mot
     handleSpreadOut({ stagger: 5 });
   }, [collectionKey, containerRef, handleSpreadOut]);
 
+  // Handle external card selection (e.g., from URL param like /create?card=xxx)
+  // This centers the card when selectedCardId is set externally, not via click
+  useEffect(() => {
+    // Skip if no selection or if this was an internal selection (ref already matches)
+    if (!selectedCardId || selectedCardIdRef.current === selectedCardId) {
+      return;
+    }
+
+    if (!containerRef.current) {
+      return;
+    }
+
+    // Check if this card exists in the current collection
+    const cardExists = cards.some((c) => c.id === selectedCardId);
+    if (!cardExists) {
+      return;
+    }
+
+    // Wait for cards to render and refs to be populated
+    const timer = setTimeout(() => {
+      const controller = draggableControllerRefs.current.get(selectedCardId);
+      const container = draggableContainerRefs.current.get(selectedCardId);
+      if (controller && containerRef.current) {
+        placeOnTop(selectedCardId);
+        controller.center(containerRef.current, centerScale);
+        setZoomEnabled(true);
+        selectedCardIdRef.current = selectedCardId;
+        selectedCardContainerRef.current = container?.e ?? null;
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [selectedCardId, cards, containerRef, centerScale, placeOnTop, setZoomEnabled]);
+
   const handleSelectCard = useCallback(
     (id: string) => {
       const target = draggableContainerRefs.current.get(id);

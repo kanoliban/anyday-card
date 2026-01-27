@@ -2,13 +2,24 @@
 
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { cn } from '~/src/util';
 
 import { collections } from '../../constants';
 import type { Card, CardVariant } from '../../models';
 import { useCardStore } from '../../store';
+
+const metadataKeys = ['occasion', 'style', 'tone', 'colors', 'size', 'paperStock'] as const;
+
+const metadataLabels: Record<(typeof metadataKeys)[number], string> = {
+  occasion: 'Occasion',
+  style: 'Style',
+  tone: 'Tone',
+  colors: 'Colors',
+  size: 'Size',
+  paperStock: 'Paper Stock',
+};
 
 interface CardPurchasePanelProps {
   card?: Card;
@@ -21,6 +32,7 @@ export function CardPurchasePanel({ card: cardProp, className, onPersonalize }: 
   const startWizard = useCardStore((s) => s.startWizard);
   const selectedCardId = useCardStore((s) => s.selectedCardId);
   const collection = useCardStore((s) => s.collection);
+  const wizardMode = useCardStore((s) => s.wizardMode);
 
   // Use prop if provided, otherwise get from store
   const card = cardProp ?? (selectedCardId
@@ -95,23 +107,43 @@ export function CardPurchasePanel({ card: cardProp, className, onPersonalize }: 
         </p>
       </div>
 
-      {/* Make My Card Button */}
-      <button
-        onClick={() => {
-          startWizard();
-          onPersonalize?.();
-        }}
-        className={cn(
-          'flex w-full items-center justify-center gap-2 rounded-md px-4 py-3',
-          'bg-stone-800 text-white',
-          'font-mono text-sm font-bold uppercase tracking-wide',
-          'transition-colors hover:bg-stone-700',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2'
-        )}
-      >
-        <Sparkles className="size-4" />
-        <span>Personalize with AI</span>
-      </button>
+      {wizardMode ? (
+        /* Card Metadata (shown when wizard is active) */
+        <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 font-mono text-xs">
+          {metadataKeys.map((key) => {
+            const value = card[key];
+            const displayValue = Array.isArray(value) ? value.join(', ') : String(value ?? '--');
+            return (
+              <Fragment key={key}>
+                <span className="font-bold uppercase tracking-wide text-stone-400">
+                  {metadataLabels[key]}
+                </span>
+                <span className="uppercase text-stone-600">
+                  {displayValue}
+                </span>
+              </Fragment>
+            );
+          })}
+        </div>
+      ) : (
+        /* Make My Card Button (hidden when wizard is active) */
+        <button
+          onClick={() => {
+            startWizard();
+            onPersonalize?.();
+          }}
+          className={cn(
+            'flex w-full items-center justify-center gap-2 rounded-md px-4 py-3',
+            'bg-stone-800 text-white',
+            'font-mono text-sm font-bold uppercase tracking-wide',
+            'transition-colors hover:bg-stone-700',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2'
+          )}
+        >
+          <Sparkles className="size-4" />
+          <span>Personalize with AI</span>
+        </button>
+      )}
     </motion.div>
   );
 }

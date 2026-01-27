@@ -26,6 +26,8 @@ interface CardStore {
   setWizardAnswer: <K extends keyof WizardAnswers>(key: K, value: WizardAnswers[K]) => void;
   resetWizard: () => void;
   startWizard: () => void;
+  // For URL param initialization - sets card + wizard atomically
+  selectCardForWizard: (cardId: string, collection: CollectionType) => void;
 }
 
 export const useCardStore = create<CardStore>((set) => ({
@@ -70,6 +72,15 @@ export const useCardStore = create<CardStore>((set) => ({
     }),
   startWizard: () =>
     set({
+      wizardMode: true,
+      wizardStep: 'name',
+      wizardAnswers: {},
+    }),
+  // For URL param initialization - sets card + wizard atomically to avoid race conditions
+  selectCardForWizard: (cardId: string, collection: CollectionType) =>
+    set({
+      collection,
+      selectedCardId: cardId,
       wizardMode: true,
       wizardStep: 'name',
       wizardAnswers: {},
